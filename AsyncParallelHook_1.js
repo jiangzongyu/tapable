@@ -1,7 +1,4 @@
 let { AsyncParallelHook } = require('tapable')
-// 异步的钩子（串行）并行 需要等待所有并发的异步事件执行后在执行回调方法
-// 同时发多个请求
-// 执行方法分为 tap 注册 tapAsync
 class Lesson {
   constructor () {
     this.hooks = {

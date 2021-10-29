@@ -1,31 +1,36 @@
 const {AsyncSeriesBailHook} = require('tapable');
-const FrontEnd = new AsyncSeriesBailHook(['name']);
 console.time('webpack');
 console.time('react');
-FrontEnd.tapPromise('webpack',(name,cb)=>{
-  return new Promise((resolve,reject)=>{
-    setTimeout(() => {
-      console.log(name+" get webpack ")
-      console.timeEnd('webpack');
-      // resolve();
-      reject('放弃了')
-    }, 1000);
-  })
-});
-FrontEnd.tapPromise('react',(name,cb)=>{
-  return new Promise((resolve)=>{
-    setTimeout(() => {
-      console.log(name+" get react ")
-      console.timeEnd('react');
-      resolve();
-    }, 1000);
-  })
-});
-FrontEnd.start=(...args)=>{
-  FrontEnd.promise(...args).then(()=>{
-    console.log("end");
-  }).catch((err)=>{
-    console.log("err",err)
-  })
-};
-FrontEnd.start('jiang');
+class Lesson {
+  constructor () {
+    this.hooks = {
+      arch: new AsyncSeriesBailHook(['name']) 
+    }
+  }
+  tap () {
+    this.hooks.arch.tapAsync('webpack', (name, cb) => {
+      setTimeout(() => {
+        console.log(name+" get webpack ")
+        console.timeEnd('webpack');
+        cb() // 参数为空
+      }, 1000)
+    })
+    this.hooks.arch.tapAsync('react', (name, cb) => {
+      setTimeout(() => {
+        console.log(name+" get react ")
+        console.timeEnd('react');
+        cb();
+      }, 1000)
+    })
+  }
+  start (...args) {
+    this.hooks.arch.callAsync(...args, function() {
+      console.log('end')
+    })
+  }
+}
+
+let l = new Lesson()
+
+l.tap()
+l.start('jiang')
